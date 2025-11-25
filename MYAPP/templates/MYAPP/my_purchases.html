@@ -1,0 +1,38 @@
+{% extends 'MYAPP/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>My Purchases</h2>
+    {% if purchases %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plan</th>
+                <th>Branch</th>
+                <th>Status</th>
+                <th>Purchase Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in purchases %}
+            <tr>
+                <td>{{ purchase.id }}</td>
+                <td>{{ purchase.plan.name }}</td>
+                <td>{{ purchase.branch.name }}</td>
+                <td><span class="badge-{{ purchase.status }}">{{ purchase.get_status_display }}</span></td>
+                <td>{{ purchase.purchase_date|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'purchase_detail' purchase.id %}" class="btn btn-primary">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You haven't made any purchases yet.</p>
+    <a href="{% url 'plans' %}" class="btn btn-primary">Browse Membership Plans</a>
+    {% endif %}
+</div>
+{% endblock %}

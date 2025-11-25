@@ -1,0 +1,34 @@
+{% extends 'securefit/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Admin Dashboard</h2>
+    <p>Manage your gym system</p>
+</div>
+
+<div class="grid">
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 3em; color: #3498db; margin: 20px 0;">{{ branches_count }}</h3>
+        <p style="font-size: 1.2em; color: #666;">Total Branches</p>
+        <a href="{% url 'admin_branches' %}" class="btn btn-primary">Manage Branches</a>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 3em; color: #2ecc71; margin: 20px 0;">{{ plans_count }}</h3>
+        <p style="font-size: 1.2em; color: #666;">Active Plans</p>
+        <a href="{% url 'admin_plans' %}" class="btn btn-success">Manage Plans</a>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 3em; color: #9b59b6; margin: 20px 0;">{{ purchases_count }}</h3>
+        <p style="font-size: 1.2em; color: #666;">Total Purchases</p>
+        <a href="{% url 'admin_purchases' %}" class="btn btn-primary">View All</a>
+    </div>
+    
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 3em; color: #f39c12; margin: 20px 0;">{{ pending_count }}</h3>
+        <p style="font-size: 1.2em; color: #666;">Pending Approvals</p>
+        <a href="{% url 'admin_purchases' %}" class="btn btn-warning">Review Now</a>
+    </div>
+</div>
+{% endblock %}

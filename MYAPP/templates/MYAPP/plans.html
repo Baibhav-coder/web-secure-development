@@ -1,0 +1,30 @@
+{% extends 'MYAPP/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Available Membership Plans</h2>
+    <p>Choose the perfect plan for your fitness goals</p>
+</div>
+
+<div class="grid">
+    {% for plan in plans %}
+    <div class="card">
+        <h3>{{ plan.name }}</h3>
+        <p>{{ plan.description }}</p>
+        <p><strong>Duration:</strong> {{ plan.get_duration_months_display }}</p>
+        <p><strong>Price:</strong> ${{ plan.price }}</p>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 4px; margin: 10px 0;">
+            <strong>Features:</strong>
+            <ul style="margin-top: 10px;">
+                {% for feature in plan.features.splitlines %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <a href="{% url 'purchase_plan' plan.id %}" class="btn btn-success">Purchase This Plan</a>
+    </div>
+    {% empty %}
+    <p>No plans available at this time.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'securefit/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Manage Membership Plans</h2>
+    <a href="{% url 'admin_plan_create' %}" class="btn btn-success">Add New Plan</a>
+    
+    {% if plans %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Price</th>
+                <th>Active</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in plans %}
+            <tr>
+                <td>{{ plan.id }}</td>
+                <td>{{ plan.name }}</td>
+                <td>{{ plan.get_duration_months_display }}</td>
+                <td>${{ plan.price }}</td>
+                <td>{% if plan.is_active %}<span style="color: #2ecc71;">✓ Yes</span>{% else %}<span style="color: #e74c3c;">✗ No</span>{% endif %}</td>
+                <td>{{ plan.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'admin_plan_edit' plan.id %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'admin_plan_delete' plan.id %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="margin-top: 20px;">No plans yet. Create one to get started!</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 20px;">
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'securefit/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ action }} Branch</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save Branch</button>
+        <a href="{% url 'admin_branches' %}" class="btn">Cancel</a>
+    </form>
+</div>
+{% endblock %}

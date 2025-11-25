@@ -1,0 +1,29 @@
+{% extends 'MYAPP/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Purchase Details #{{ purchase.id }}</h2>
+    
+    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p><strong>Member:</strong> {{ purchase.user.get_full_name|default:purchase.user.username }}</p>
+        <p><strong>Email:</strong> {{ purchase.user.email }}</p>
+        <p><strong>Plan:</strong> {{ purchase.plan.name }}</p>
+        <p><strong>Duration:</strong> {{ purchase.plan.get_duration_months_display }}</p>
+        <p><strong>Price:</strong> ${{ purchase.plan.price }}</p>
+        <p><strong>Branch:</strong> {{ purchase.branch.name }}</p>
+        <p><strong>Status:</strong> <span class="badge-{{ purchase.status }}">{{ purchase.get_status_display }}</span></p>
+        <p><strong>Purchase Date:</strong> {{ purchase.purchase_date|date:"F d, Y H:i" }}</p>
+    </div>
+    
+    {% if purchase.notes %}
+    <div style="background: #fff3cd; padding: 15px; border-radius: 4px; margin-top: 15px; border-left: 4px solid #ffc107;">
+        <strong>Notes:</strong>
+        <p style="margin-top: 10px;">{{ purchase.notes|safe }}</p>
+    </div>
+    {% endif %}
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'my_purchases' %}" class="btn btn-primary">Back to My Purchases</a>
+    </div>
+</div>
+{% endblock %}

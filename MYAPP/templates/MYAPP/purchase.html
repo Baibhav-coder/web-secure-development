@@ -1,0 +1,38 @@
+{% extends 'MYAPP/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Purchase: {{ plan.name }}</h2>
+
+    <p><strong>Duration:</strong> {{ plan.duration_days }} days</p>
+    <p><strong>Price:</strong> ${{ plan.price }}</p>
+
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+
+    <h3>Complete Your Purchase</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Select Branch:</label>
+            <select name="branch" required>
+                <option value="">-- Select Branch --</option>
+                {% for branch in branches %}
+                    <option value="{{ branch.id }}">
+                        {{ branch.name }} ({{ branch.city }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Notes (Optional):</label>
+            <textarea name="notes" placeholder="Any special requests"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">Submit Purchase Request</button>
+        <a href="{% url 'plans' %}" class="btn">Cancel</a>
+    </form>
+</div>
+{% endblock %}

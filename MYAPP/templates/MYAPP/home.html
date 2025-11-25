@@ -1,0 +1,42 @@
+{% extends 'MYAPP/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Welcome to SecureFiT Gym</h1>
+    <p>Your fitness journey starts here! Choose from our flexible membership plans and access any of our branches.</p>
+</div>
+
+<h2>Our Membership Plans</h2>
+<div class="grid">
+    {% for plan in plans %}
+    <div class="card">
+        <h3>{{ plan.name }}</h3>
+        <p>{{ plan.description }}</p>
+        <p><strong>Duration:</strong> {{ plan.get_duration_months_display }}</p>
+        <p><strong>Price:</strong> ${{ plan.price }}</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            {% for feature in plan.features.splitlines %}
+            <li>{{ feature }}</li>
+            {% endfor %}
+        </ul>
+        {% if user.is_authenticated %}
+        <a href="{% url 'purchase_plan' plan.id %}" class="btn btn-primary">Purchase Now</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary">Login to Purchase</a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<h2>Our Branches</h2>
+<div class="grid">
+    {% for branch in branches %}
+    <div class="card">
+        <h3>{{ branch.name }}</h3>
+        <p>{{ branch.address }}</p>
+        <p><strong>Phone:</strong> {{ branch.phone }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
