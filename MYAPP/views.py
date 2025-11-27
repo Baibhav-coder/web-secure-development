@@ -1,19 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, logout
-from django.db import connection
-from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from .forms import RegisterForm
 from .models import GymBranch, MembershipPlan, Purchase
 
 
 # ======================================================================
-# HOME PAGE (DISPLAYS PLANS + BRANCHES)
+# HOME PAGE (SAFE)
 # ======================================================================
 def home(request):
-    # Home page is safe — just returns data to the template.
     plans = MembershipPlan.objects.filter(is_active=True)
     branches = GymBranch.objects.all()
 
@@ -24,7 +22,7 @@ def home(request):
 
 
 # ======================================================================
-# USER REGISTRATION (INTENTIONALLY VULNERABLE)
+# USER REGISTRATION (SECURE)
 # ======================================================================
 def register_view(request):
     if request.method == 'POST':
@@ -32,20 +30,12 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
 
-            # ==========================================================
-            # 🚨 VULNERABILITY #2: PLAIN TEXT PASSWORD STORAGE
             # ----------------------------------------------------------
-            # Instead of hashing passwords (Django uses PBKDF2 by default),
-            # this code stores the password in clear text.
-            #
-            # IMPACT:
-            #   • If database is leaked → All real passwords exposed
-            #   • Administrator can see user passwords
-            #   • Violates every security standard (GDPR, NIST, OWASP)
-            #
-            # REAL FIX WOULD BE: user.set_password(...)
-            # ==========================================================
-            user.password = form.cleaned_data['password']  # ❌ insecure
+            # FIXED: PASSWORD HASHING
+            # ----------------------------------------------------------
+            # Django automatically hashes passwords using PBKDF2.
+            # This prevents plaintext password disclosure risk.
+            user.set_password(form.cleaned_data['password'])
             user.save()
 
             login(request, user)
@@ -58,46 +48,32 @@ def register_view(request):
 
 
 # ======================================================================
-# USER LOGIN (INTENTIONALLY VULNERABLE)
+# USER LOGIN (SECURE)
 # ======================================================================
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # ==========================================================
-        # 🚨 VULNERABILITY #1: SQL INJECTION
         # ----------------------------------------------------------
-        # This raw SQL query directly injects user input without
-        # sanitization. An attacker can:
-        #
-        #   • Bypass login using → ' OR '1'='1
-        #   • Dump password table using UNION SELECT
-        #   • Log in as admin without password
-        #
-        # This is one of the most severe OWASP vulnerabilities.
-        #
-        # REAL FIX WOULD BE: use Django's authenticate()
-        # ==========================================================
-        sql = f"SELECT id, username FROM auth_user WHERE username='{username}' AND password='{password}'"
+        # FIXED: SQL INJECTION REMOVED
+        # ----------------------------------------------------------
+        # authenticate() safely checks credentials using hashing,
+        # parameterized queries, and Django's auth backend.
+        user = authenticate(request, username=username, password=password)
 
-        with connection.cursor() as cursor:
-            cursor.execute(sql)  # ❌ Executes user-controlled SQL
-            user_data = cursor.fetchone()
-
-        if user_data:
-            user = User.objects.get(id=user_data[0])
+        if user:
             login(request, user)
-            messages.success(request, "Login successful (RAW SQL used).")
+            messages.success(request, "Login successful!")
             return redirect('home')
         else:
-            messages.error(request, "Invalid credentials entered.")
+            messages.error(request, "Invalid username or password.")
 
     return render(request, 'MYAPP/login.html')
 
 
 # ======================================================================
-# USER LOGOUT
+# LOGOUT
 # ======================================================================
 def logout_view(request):
     logout(request)
@@ -110,7 +86,6 @@ def logout_view(request):
 # ======================================================================
 @login_required
 def plans_view(request):
-    # This displays all available membership plans.
     plans = MembershipPlan.objects.filter(is_active=True)
     return render(request, 'MYAPP/plans.html', {'plans': plans})
 
@@ -120,12 +95,12 @@ def plans_view(request):
 # ======================================================================
 @login_required
 def purchase_plan(request, plan_id):
-    plan = MembershipPlan.objects.get(id=plan_id)
+    plan = get_object_or_404(MembershipPlan, id=plan_id)
     branches = GymBranch.objects.all()
 
     if request.method == 'POST':
         branch_id = request.POST.get('branch')
-        branch = GymBranch.objects.get(id=branch_id)
+        branch = get_object_or_404(GymBranch, id=branch_id)
 
         Purchase.objects.create(
             user=request.user,
@@ -141,7 +116,7 @@ def purchase_plan(request, plan_id):
 
 
 # ======================================================================
-# VIEW USER’S OWN PURCHASES (SAFE)
+# VIEW USER’S OWN PURCHASES
 # ======================================================================
 @login_required
 def my_purchases(request):
@@ -150,30 +125,22 @@ def my_purchases(request):
 
 
 # ======================================================================
-# PURCHASE DETAIL (INTENTIONALLY VULNERABLE)
+# PURCHASE DETAIL (SECURE — IDOR FIXED)
 # ======================================================================
 @login_required
 def purchase_detail(request, purchase_id):
 
-    # ==========================================================
-    # 🚨 VULNERABILITY #3: IDOR (Insecure Direct Object Reference)
     # ----------------------------------------------------------
-    # Problem:
-    #   This line fetches ANY purchase based only on purchase_id.
-    #
-    #   Attack:
-    #       If user A changes the URL:
-    #           /purchase-detail/5/
-    #       They can view user B’s order.
-    #
-    # WHY IT'S DANGEROUS:
-    #   • Leaks personal billing data
-    #   • Cross-user data exposure
-    #   • Violates access control rules
-    #
-    # REAL FIX WOULD BE:
-    #   Purchase.objects.get(id=purchase_id, user=request.user)
-    # ==========================================================
-    purchase = Purchase.objects.get(id=purchase_id)  # ❌ no ownership check
+    # FIXED: IDOR VULNERABILITY
+    # ----------------------------------------------------------
+    # We now enforce ownership:
+    # Only the user who made the purchase can access it.
+    # If not owned → 404 Not Found.
+    # ----------------------------------------------------------
+    purchase = get_object_or_404(
+        Purchase,
+        id=purchase_id,
+        user=request.user
+    )
 
     return render(request, 'MYAPP/purchase_detail.html', {'purchase': purchase})

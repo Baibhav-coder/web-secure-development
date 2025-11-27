@@ -93,25 +93,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-# ===============================================================
-# 🚨 INTENTIONALLY INSECURE COOKIE & CSRF SETTINGS FOR DEMO
-# ===============================================================
+# ===========================================================================
+# 🔐 SECURE COOKIE & CSRF SETTINGS (FIXED)
+# ===========================================================================
 
-# Allows cookies over HTTP (not HTTPS)
-SESSION_COOKIE_SECURE = False
+# Cookies will ONLY be sent over HTTPS (prevents theft on public WiFi)
+SESSION_COOKIE_SECURE = True
 
-# Allows JavaScript to read sessionid → session hijacking possible
-SESSION_COOKIE_HTTPONLY = False
+# Cookie cannot be accessed via JavaScript (prevents session hijacking via XSS)
+SESSION_COOKIE_HTTPONLY = True
 
-# Allows cross-site cookie sending → enables CSRF attacks
-SESSION_COOKIE_SAMESITE = 'Lax'
+# Cookie is NOT sent in cross-site requests (prevents CSRF attacks)
+SESSION_COOKIE_SAMESITE = 'Strict'
 
+# CSRF cookie hardened as well
+CSRF_COOKIE_SECURE = True          # Only sent via HTTPS
+CSRF_COOKIE_HTTPONLY = True        # Not accessible via JavaScript
+CSRF_COOKIE_SAMESITE = 'Strict'    # Blocks cross-site CSRF
 
-# CSRF cookie also exposed and not HTTP-only (dangerous)
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = 'Lax'
+# ===========================================================================
+# END OF SECURE SETTINGS
+# ===========================================================================
 
-# ===============================================================
-# END OF VULNERABLE SETTINGS
-# ===============================================================

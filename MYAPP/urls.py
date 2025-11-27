@@ -15,7 +15,4 @@ urlpatterns = [
     path('purchase/<int:plan_id>/', views.purchase_plan, name='purchase_plan'),
     path('my-purchases/', views.my_purchases, name='my_purchases'),
     path('purchase-detail/<int:purchase_id>/', views.purchase_detail, name='purchase_detail'),
-
-    # ❌ Vulnerability #3 — Plain text password leak
-    path('leak-users/', views.leak_users, name='leak_users'),
 ]
