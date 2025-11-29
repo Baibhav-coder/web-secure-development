@@ -318,3 +318,10 @@ Fixing IDOR
 Securing session cookies
 
 Enforcing CSRF protections
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+🏷️ Credits
+
+Base application and all security enhancements developed by:
+Baibhav Chowdhury (Student ID: 24232033)
