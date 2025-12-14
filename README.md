@@ -111,6 +111,7 @@ You can now:
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 📘 6. Usage Guidelines
+
 This segment clarifies how to operate with the SecureFit app when it is launched.
 
 ✅ 1. Home Page
@@ -308,16 +309,6 @@ https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.ht
 
 OWASP Cross-Site Request Forgery (CSRF) Prevention Cheat Sheet
 https://cheatsheetseries.owasp.org/cheatsheets/CSRF_Prevention_Cheat_Sheet.html
-
-These references support your justification for:
-
-Fixing SQL Injection
-
-Fixing IDOR
-
-Securing session cookies
-
-Enforcing CSRF protections
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
